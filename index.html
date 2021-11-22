@@ -173,6 +173,10 @@
         '43210', '54321', '65432', '76543', '87654', '98765', '09876',
     ]
 
+    const duizi = [
+        '00', '11', '22', '33', '44', '55', '66', '77', '88', '99'
+    ]
+
     new Vue({
         el: '#app',
         data: {
@@ -275,7 +279,8 @@
                 }
                 let c = this.count(label)
                 if (this.dui) {
-                    if (c < 2) return false
+                    // if (c < 2) return false
+                    if (duizi.every(xs => !label.match(new RegExp(xs)))) return false
                 }
 
                 if (this.santiao) {
