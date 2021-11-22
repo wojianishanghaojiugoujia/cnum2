@@ -80,7 +80,7 @@
                 <input type="checkbox" v-model="wutiao"> 五条
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" v-model="zasi"> 杂四
+                <input type="checkbox" v-model="zawu"> 杂五
             </label>
             <label class="checkbox-inline">
                 <input type="checkbox" v-model="xiaoshun"> 3顺
@@ -185,7 +185,7 @@
             santiao: false,
             sitiao: false,
             wutiao: false,
-            zasi: false,
+            zawu: false,
             xiaoshun: false,
             dashun: false,
             wushun: false,
@@ -229,7 +229,7 @@
                 this.santiao = false
                 this.sitiao = false
                 this.wutiao = false
-                this.zasi = false
+                this.zawu = false
                 this.xiaoshun = false
                 this.dashun = false
                 this.wushun = false
@@ -290,7 +290,7 @@
                     if (c < 5) return false
                 }
 
-                if (this.zasi) {
+                if (this.zawu) {
                     if (c > 1) return false
                 }
 
