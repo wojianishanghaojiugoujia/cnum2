@@ -266,16 +266,12 @@
                 }
 
                 if (!check2) {
-                    let c2 = false
                     for (let i in this.includes2) {
                         if (this.includes2[i]) {
-                            if (label.includes(i)) {
-                                c2 = true
-                                break
-                            }
+                            console.log(label.includes(i), i)
+                            if (label.includes(i) === false) return false
                         }
                     }
-                    if (c2 === false) return false
                 }
                 let c = this.count(label)
                 if (this.dui) {
