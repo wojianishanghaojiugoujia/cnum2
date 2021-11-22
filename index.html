@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Number filter</title>
+    <title>5位数组合</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
@@ -144,14 +144,18 @@
             </template>
             <button class="btn btn-sm" @click.prevent="reset_sum">重置</button>
         </div>
-        <label>数量：{{ filterAll.length }}
+        <label>
             <button class="btn btn-sm btn-primary" @click.prevent.stop="showList = !showList">
                 {{ showList ? '隐藏列表' : '显示列表'}}
             </button>
+            <button class="btn btn-sm btn-primary" @click.prevent.stop="fan = !fan">
+                {{ fan ? '查看筛选组合' : '查看不匹配组合'}}
+            </button>
+            数量：{{ fan ? (all.length - filterAll.length) : filterAll.length }}
         </label>
     </form>
     <div class="container cell-container" v-if="showList">
-        <div class="cell" v-for="n in all" :key="n" v-show="filterAllMap[n]">
+        <div class="cell" v-for="n in all" :key="n" v-show="fan ? filterAllMap[n] === undefined : filterAllMap[n]">
             {{ n }}
         </div>
     </div>
@@ -196,6 +200,7 @@
         el: '#app',
         data: {
             showList: true,
+            fan: false,
             includes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             includes2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             includes3: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
