@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Number filter</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <style>
+        body, html {
+            height: 100%;
+            padding: 10px;
+        }
+
+        .hl {
+            color: red;
+        }
+
+        .app-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cell-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            width: 100%;
+            flex: 1;
+            overflow-y: auto;
+            align-content: flex-start;
+        }
+
+        .cell {
+            border: 1px solid #000;
+            padding: 0 10px;
+            height: 40px;
+            line-height: 40px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="app" class="container-fluid app-container">
+    <form>
+        <div class="checkbox">
+            <label>含有勾选数组的组合</label>
+            <template v-for="i in 10">
+                <label class="checkbox-inline">
+                    <input type="checkbox" v-model="includes2[i-1]"> {{i-1}}
+                </label>
+            </template>
+            <button class="btn btn-sm" @click.prevent="reset_includes2">重置</button>
+        </div>
+        <div class="checkbox">
+            <label>只有勾选数组的组合</label>
+            <template v-for="i in 10">
+                <label class="checkbox-inline">
+                    <input type="checkbox" v-model="includes[i-1]"> {{i-1}}
+                </label>
+            </template>
+            <button class="btn btn-sm" @click.prevent="reset_includes">重置</button>
+        </div>
+        <div class="checkbox">
+            <label>其他组合</label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="dui"> 对子
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="santiao"> 三条
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="sitiao"> 四条
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="wutiao"> 五条
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="zasi"> 杂四
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="xiaoshun"> 小顺
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="dashun"> 大顺
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="allbig"> 全大
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="allsmall"> 全小
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="onedan"> 1单
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="twodan"> 2单
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="threedan"> 3单
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="sidan"> 4单
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="alldan"> 全单
+            </label>
+<!--            <label class="checkbox-inline">-->
+<!--                <input type="checkbox" v-model="oneshuang"> 1双-->
+<!--            </label>-->
+<!--            <label class="checkbox-inline">-->
+<!--                <input type="checkbox" v-model="twoshuang"> 2双-->
+<!--            </label>-->
+<!--            <label class="checkbox-inline">-->
+<!--                <input type="checkbox" v-model="threeshuang"> 3双-->
+<!--            </label>-->
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="allshuang"> 全双
+            </label>
+            <button class="btn btn-sm" @click.prevent="reset_other">重置</button>
+        </div>
+        <div class="checkbox">
+            <label>合值</label>
+            <template v-for="i in 46">
+                <label class="checkbox-inline">
+                    <input type="checkbox" v-model="sum[i-1]"> {{i-1}}
+                </label>
+            </template>
+            <button class="btn btn-sm" @click.prevent="reset_sum">重置</button>
+        </div>
+        <label>数量：{{ filterAll.length }}</label>
+    </form>
+    <div class="container cell-container">
+        <div class="cell" v-for="n in filterAll" :key="n" v-show="show(n)">
+<!--            <span v-html="display(n)"></span>-->
+            {{ n }}
+        </div>
+    </div>
+</div>
+
+<!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"
+        integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"
+        crossorigin="anonymous"></script>
+<!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+
+<script>
+
+    const xiaoshunArr = ['012', '123', '234', '345', '456', '567', '678', '789', '890',
+'210', '321', '432', '543', '654', '765', '876', '987', '098'
+]
+	 const dashunArr = ['0123', '1234', '2345', '3456', '4567', '5678', '6789', '7890',
+	'3210', '4321', '5432', '6543', '7654', '8765', '9876', '0987'
+	]
+
+    new Vue({
+        el: '#app',
+        data: {
+            min: 0,
+            max: 99999,
+            includes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            includes2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            dui: false,
+            santiao: false,
+            sitiao: false,
+            wutiao: false,
+            zasi: false,
+            xiaoshun: false,
+            dashun: false,
+            allbig: false,
+            allsmall: false,
+            alldan: false,
+            allshuang: false,
+            onedan: false,
+            twodan: false,
+            threedan: false,
+            sidan: false,
+            oneshuang: false,
+            twoshuang: false,
+            threeshuang: false,
+            sum: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    0,0,0,0,0,0,0,0,0],
+        },
+        computed: {
+            all() {
+                let arr = []
+                for (let i = Number(this.min); i <= Number(this.max); ++i) {
+                    arr.push(i)
+                }
+                return arr
+            },
+            filterAll() {
+                let arr = []
+                for (let n of this.all) {
+                    let label = n.toString().padStart(this.max.toString().length, 0)
+                    if (this.show(label)) {
+                        arr.push(label)
+                    }
+                }
+                return arr
+            },
+        },
+        methods: {
+            reset_sum() {
+                this.sum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,0,0,0,0,0,0,0,0]
+            },
+            reset_other() {
+                this.dui = false
+                this.santiao = false
+                this.sitiao = false
+                this.wutiao = false
+                this.zasi = false
+                this.xiaoshun = false
+                this.dashun = false
+                this.allbig = false
+                this.allsmall = false
+                this.alldan = false
+                this.allshuang = false
+                this.onedan = false
+                this.twodan = false
+                this.threedan = false
+                this.sidan = false
+                this.oneshuang = false
+                this.twoshuang = false
+                this.threeshuang = false
+            },
+            reset_includes() {
+                this.includes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
+            },
+            reset_includes2() {
+                this.includes2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
+            },
+            show(label) {
+                let check1 = this.includes.filter(v => v).length === 0
+                let check2 = this.includes2.filter(v => v).length === 0
+
+                if (!check1) {
+                    for (let chr of label) {
+                        if (!this.includes[chr]) return false
+                    }
+                }
+
+                if (!check2) {
+                    let c2 = false
+                    for (let i in this.includes2) {
+                        if (this.includes2[i]) {
+                            if (label.includes(i)) {
+                                c2 = true
+                                break
+                            }
+                        }
+                    }
+                    if (c2 === false) return false
+                }
+                let c = this.count(label)
+                if (this.dui) {
+                    if (c < 2) return false
+                }
+
+                if (this.santiao) {
+                    if (c < 3) return false
+                }
+
+                if (this.sitiao) {
+                    if (c < 4) return false
+                }
+
+                if(this.wutiao) {
+                    if(c < 5) return false
+                }
+
+                if (this.zasi) {
+                    if (c > 1) return false
+                }
+
+                if (this.xiaoshun) {
+                    if(xiaoshunArr.every(xs => !label.match(new RegExp(xs)))) return false
+                }
+                if (this.dashun) {
+							if(dashunArr.every(xs => !label.match(new RegExp(xs)))) return false
+                }
+
+                if (this.sum.filter(v => v).length > 0) {
+                    let sum = [...label].map(v => Number(v)).reduce((a, b) => a + b, 0)
+                    if (!this.sum[sum]) return false
+                }
+
+                if (this.allbig) {
+                    if ([...label].some(c => Number(c) < 5)) return false
+                }
+
+                if (this.allsmall) {
+                    if ([...label].some(c => Number(c) > 4)) return false
+                }
+
+                let dans = [...label].filter(c => Number(c) % 2 === 1)
+
+                if (this.onedan) {
+                    if (dans.length !== 1) return false
+                }
+
+                if (this.twodan) {
+                    if (dans.length !== 2) return false
+                }
+
+                if (this.threedan) {
+                    if (dans.length !== 3) return false
+                }
+
+                if(this.sidan) {
+                    if(dans.length !== 4) return false
+                }
+
+                if (this.alldan) {
+                    if (dans.length !== label.length) return false
+                }
+
+                let ss = [...label].filter(c => Number(c) % 2 === 0)
+                if (this.oneshuang) {
+                    if (ss.length !== 1) return false
+                }
+
+                if (this.twoshuang) {
+                    if (ss.length !== 2) return false
+                }
+
+                if (this.threeshuang) {
+                    if (ss.length !== 3) return false
+                }
+
+                if (this.allshuang) {
+                    if (ss.length !== label.length) return false
+                }
+
+                return true
+            },
+            count(label) {
+                let c = {}
+                for (let cc of label) {
+                    if (c[cc] === undefined) {
+                        c[cc] = 0
+                    }
+                    c[cc]++
+                }
+                return Math.max(...Object.values(c))
+            },
+            display(label) {
+                let dp = []
+                for (let c of label) {
+                    if (this.includes.filter(v => v).length && this.includes[c]) {
+                        dp.push(`<span class="hl">${c}</span>`)
+                    } else if (this.includes2.filter(v => v).length && this.includes2[c]) {
+                        dp.push(`<span class="hl">${c}</span>`)
+                    } else {
+                        dp.push(`<span>${c}</span>`)
+                    }
+                }
+                return dp.join('')
+            },
+        },
+    })
+</script>
+
+</body>
+</html>
