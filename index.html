@@ -141,10 +141,10 @@
         </label>
     </form>
     <div class="container cell-container" v-if="showList">
-        <textarea class="form-control" style="height: 100%" readonly>{{ filterAll.join("\n") }}</textarea>
-<!--        <div class="cell" v-for="n in filterAll" :key="n">-->
-<!--            {{ n }}-->
-<!--        </div>-->
+<!--        <textarea class="form-control" style="height: 100%" readonly>{{ filterAll.join("\n") }}</textarea>-->
+        <div class="cell" v-for="n in filterAll" :key="n">
+            {{ n }}
+        </div>
     </div>
 </div>
 
