@@ -66,6 +66,15 @@
             <button class="btn btn-sm" @click.prevent="reset_includes">重置</button>
         </div>
         <div class="checkbox">
+            <label>勾选数必配+自配</label>
+            <template v-for="i in 10">
+                <label class="checkbox-inline">
+                    <input type="checkbox" v-model="includes3[i-1]"> {{i - 1}}
+                </label>
+            </template>
+            <button class="btn btn-sm" @click.prevent="reset_includes3">重置</button>
+        </div>
+        <div class="checkbox">
             <label>其他组合</label>
             <label class="checkbox-inline">
                 <input type="checkbox" v-model="dui"> 对子
@@ -136,13 +145,13 @@
             <button class="btn btn-sm" @click.prevent="reset_sum">重置</button>
         </div>
         <label>数量：{{ filterAll.length }}
-            <button class="btn btn-sm btn-primary" @click.prevent.stop="showList = !showList">{{ showList ? '隐藏列表' : '显示列表'}}
+            <button class="btn btn-sm btn-primary" @click.prevent.stop="showList = !showList">
+                {{ showList ? '隐藏列表' : '显示列表'}}
             </button>
         </label>
     </form>
     <div class="container cell-container" v-if="showList">
-<!--        <textarea class="form-control" style="height: 100%" readonly>{{ filterAll.join("\n") }}</textarea>-->
-        <div class="cell" v-for="n in filterAll" :key="n">
+        <div class="cell" v-for="n in all" :key="n" v-show="filterAllMap[n]">
             {{ n }}
         </div>
     </div>
@@ -160,31 +169,36 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 
 <script>
-
     const xiaoshunArr = ['012', '123', '234', '345', '456', '567', '678', '789', '890',
         '210', '321', '432', '543', '654', '765', '876', '987', '098'
     ]
     const dashunArr = ['0123', '1234', '2345', '3456', '4567', '5678', '6789', '7890',
         '3210', '4321', '5432', '6543', '7654', '8765', '9876', '0987'
     ]
-
     const _5shun = [
         '01234', '12345', '23456', '34567', '45678', '56789', '67890',
         '43210', '54321', '65432', '76543', '87654', '98765', '09876',
     ]
-
     const duizi = [
         '00', '11', '22', '33', '44', '55', '66', '77', '88', '99'
     ]
 
+    const min = 0
+    const max = 99999
+    const arr = []
+
+    for (let i = min; i <= max; ++i) {
+        arr.push(i.toString().padStart(max.toString().length, 0))
+    }
+    Object.freeze(arr)
+
     new Vue({
         el: '#app',
         data: {
-            min: 0,
-            max: 99999,
             showList: true,
             includes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             includes2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            includes3: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             dui: false,
             santiao: false,
             sitiao: false,
@@ -207,28 +221,41 @@
             sum: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
         computed: {
-            all() {
-                let arr = []
-                for (let i = Number(this.min); i <= Number(this.max); ++i) {
-                    arr.push(i.toString().padStart(this.max.toString().length, 0))
-                }
+            all () {
                 return arr
             },
-            filterAll() {
-                let arr = []
+            filterAllMap () {
+                let map = {}
+                console.log('start')
+                let st = (new Date).valueOf()
                 for (let label of this.all) {
                     if (this.show(label)) {
-                        arr.push(label)
+                        map[label] = true
                     }
                 }
-                return arr
+                let et = (new Date).valueOf()
+                console.log(et - st)
+                return map
+            },
+            filterAll () {
+                console.log(Object.keys(this.filterAllMap))
+                return Object.keys(this.filterAllMap)
+            },
+            includesChecked () {
+                return this.includes.filter(v => v)
+            },
+            includes2Checked () {
+                return this.includes2.filter(v => v)
+            },
+            includes3Checked () {
+                return this.includes3.filter(v => v)
             },
         },
         methods: {
-            reset_sum() {
+            reset_sum () {
                 this.sum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             },
-            reset_other() {
+            reset_other () {
                 this.dui = false
                 this.santiao = false
                 this.sitiao = false
@@ -249,23 +276,23 @@
                 this.twoshuang = false
                 this.threeshuang = false
             },
-            reset_includes() {
+            reset_includes () {
                 this.includes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
             },
-            reset_includes2() {
+            reset_includes2 () {
                 this.includes2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
             },
-            show(label) {
-                let check1 = this.includes.filter(v => v).length === 0
-                let check2 = this.includes2.filter(v => v).length === 0
-
-                if (!check1) {
+            reset_includes3 () {
+                this.includes3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
+            },
+            show (label) {
+                if (this.includesChecked.length > 0) {
                     for (let chr of label) {
                         if (!this.includes[chr]) return false
                     }
                 }
 
-                if (!check2) {
+                if (this.includes2Checked.length > 0) {
                     let c2 = false
                     for (let i in this.includes2) {
                         if (this.includes2[i]) {
@@ -277,9 +304,33 @@
                     }
                     if (c2 === false) return false
                 }
-                let c = this.count(label)
+
+                if (this.includes3Checked.length > 0) {
+                    let cc = true
+                    for (let i in this.includes3) {
+                        if (this.includes3[i]) {
+                            if (label.includes(i) === false) {
+                                cc = false
+                                break
+                            }
+                        }
+                    }
+                    if (cc === false) {
+                        if ([...label].every(chr => this.includes3[chr])) {
+                            cc = true
+                        }
+                    }
+                    if (cc === false) {
+                        return false
+                    }
+                }
+
+                let c
+                if (this.dui || this.santiao || this.sitiao || this.wutiao || this.zawu) {
+                    c = this.count(label)
+                }
+
                 if (this.dui) {
-                    // if (c < 2) return false
                     if (duizi.every(xs => !label.match(new RegExp(xs)))) return false
                 }
 
@@ -322,7 +373,10 @@
                     if ([...label].some(c => Number(c) > 4)) return false
                 }
 
-                let dans = [...label].filter(c => Number(c) % 2 === 1)
+                let dans
+                if (this.onedan || this.twodan || this.threedan || this.sidan || this.alldan) {
+                    dans = [...label].filter(c => Number(c) % 2 === 1)
+                }
 
                 if (this.onedan) {
                     if (dans.length !== 1) return false
@@ -344,7 +398,11 @@
                     if (dans.length !== label.length) return false
                 }
 
-                let ss = [...label].filter(c => Number(c) % 2 === 0)
+                let ss
+                if (this.oneshuang || this.twoshuang || this.threeshuang || this.allshuang) {
+                    ss = [...label].filter(c => Number(c) % 2 === 0)
+                }
+
                 if (this.oneshuang) {
                     if (ss.length !== 1) return false
                 }
@@ -363,7 +421,7 @@
 
                 return true
             },
-            count(label) {
+            count (label) {
                 let c = {}
                 for (let cc of label) {
                     if (c[cc] === undefined) {
@@ -373,7 +431,7 @@
                 }
                 return Math.max(...Object.values(c))
             },
-            display(label) {
+            display (label) {
                 let dp = []
                 for (let c of label) {
                     if (this.includes.filter(v => v).length && this.includes[c]) {
