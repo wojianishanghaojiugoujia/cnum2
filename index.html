@@ -51,7 +51,7 @@
             <label>含有勾选数组的组合</label>
             <template v-for="i in 10">
                 <label class="checkbox-inline">
-                    <input type="checkbox" v-model="includes2[i-1]"> {{i-1}}
+                    <input type="checkbox" v-model="includes2[i-1]"> {{i - 1}}
                 </label>
             </template>
             <button class="btn btn-sm" @click.prevent="reset_includes2">重置</button>
@@ -60,7 +60,7 @@
             <label>只有勾选数组的组合</label>
             <template v-for="i in 10">
                 <label class="checkbox-inline">
-                    <input type="checkbox" v-model="includes[i-1]"> {{i-1}}
+                    <input type="checkbox" v-model="includes[i-1]"> {{i - 1}}
                 </label>
             </template>
             <button class="btn btn-sm" @click.prevent="reset_includes">重置</button>
@@ -83,10 +83,13 @@
                 <input type="checkbox" v-model="zasi"> 杂四
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" v-model="xiaoshun"> 小顺
+                <input type="checkbox" v-model="xiaoshun"> 3顺
             </label>
             <label class="checkbox-inline">
-                <input type="checkbox" v-model="dashun"> 大顺
+                <input type="checkbox" v-model="dashun"> 4顺
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" v-model="wushun"> 5顺
             </label>
             <label class="checkbox-inline">
                 <input type="checkbox" v-model="allbig"> 全大
@@ -109,15 +112,15 @@
             <label class="checkbox-inline">
                 <input type="checkbox" v-model="alldan"> 全单
             </label>
-<!--            <label class="checkbox-inline">-->
-<!--                <input type="checkbox" v-model="oneshuang"> 1双-->
-<!--            </label>-->
-<!--            <label class="checkbox-inline">-->
-<!--                <input type="checkbox" v-model="twoshuang"> 2双-->
-<!--            </label>-->
-<!--            <label class="checkbox-inline">-->
-<!--                <input type="checkbox" v-model="threeshuang"> 3双-->
-<!--            </label>-->
+            <!--            <label class="checkbox-inline">-->
+            <!--                <input type="checkbox" v-model="oneshuang"> 1双-->
+            <!--            </label>-->
+            <!--            <label class="checkbox-inline">-->
+            <!--                <input type="checkbox" v-model="twoshuang"> 2双-->
+            <!--            </label>-->
+            <!--            <label class="checkbox-inline">-->
+            <!--                <input type="checkbox" v-model="threeshuang"> 3双-->
+            <!--            </label>-->
             <label class="checkbox-inline">
                 <input type="checkbox" v-model="allshuang"> 全双
             </label>
@@ -127,16 +130,18 @@
             <label>合值</label>
             <template v-for="i in 46">
                 <label class="checkbox-inline">
-                    <input type="checkbox" v-model="sum[i-1]"> {{i-1}}
+                    <input type="checkbox" v-model="sum[i-1]"> {{i - 1}}
                 </label>
             </template>
             <button class="btn btn-sm" @click.prevent="reset_sum">重置</button>
         </div>
-        <label>数量：{{ filterAll.length }}</label>
+        <label>数量：{{ filterAll.length }}
+            <button class="btn btn-sm btn-primary" @click.prevent.stop="showList = !showList">{{ showList ? '隐藏列表' : '显示列表'}}
+            </button>
+        </label>
     </form>
-    <div class="container cell-container">
-        <div class="cell" v-for="n in filterAll" :key="n" v-show="show(n)">
-<!--            <span v-html="display(n)"></span>-->
+    <div class="container cell-container" v-if="showList">
+        <div class="cell" v-for="n in filterAll" :key="n">
             {{ n }}
         </div>
     </div>
@@ -156,17 +161,23 @@
 <script>
 
     const xiaoshunArr = ['012', '123', '234', '345', '456', '567', '678', '789', '890',
-'210', '321', '432', '543', '654', '765', '876', '987', '098'
-]
-	 const dashunArr = ['0123', '1234', '2345', '3456', '4567', '5678', '6789', '7890',
-	'3210', '4321', '5432', '6543', '7654', '8765', '9876', '0987'
-	]
+        '210', '321', '432', '543', '654', '765', '876', '987', '098'
+    ]
+    const dashunArr = ['0123', '1234', '2345', '3456', '4567', '5678', '6789', '7890',
+        '3210', '4321', '5432', '6543', '7654', '8765', '9876', '0987'
+    ]
+
+    const _5shun = [
+        '01234', '12345', '23456', '34567', '45678', '56789', '67890',
+        '43210', '54321', '65432', '76543', '87654', '98765', '09876',
+    ]
 
     new Vue({
         el: '#app',
         data: {
             min: 0,
             max: 99999,
+            showList: true,
             includes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             includes2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
             dui: false,
@@ -176,6 +187,7 @@
             zasi: false,
             xiaoshun: false,
             dashun: false,
+            wushun: false,
             allbig: false,
             allsmall: false,
             alldan: false,
@@ -187,20 +199,19 @@
             oneshuang: false,
             twoshuang: false,
             threeshuang: false,
-            sum: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,    0,0,0,0,0,0,0,0,0],
+            sum: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         },
         computed: {
             all() {
                 let arr = []
                 for (let i = Number(this.min); i <= Number(this.max); ++i) {
-                    arr.push(i)
+                    arr.push(i.toString().padStart(this.max.toString().length, 0))
                 }
                 return arr
             },
             filterAll() {
                 let arr = []
-                for (let n of this.all) {
-                    let label = n.toString().padStart(this.max.toString().length, 0)
+                for (let label of this.all) {
                     if (this.show(label)) {
                         arr.push(label)
                     }
@@ -210,7 +221,7 @@
         },
         methods: {
             reset_sum() {
-                this.sum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0,0,0,0,0,0,0,0,0]
+                this.sum = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             },
             reset_other() {
                 this.dui = false
@@ -220,6 +231,7 @@
                 this.zasi = false
                 this.xiaoshun = false
                 this.dashun = false
+                this.wushun = false
                 this.allbig = false
                 this.allsmall = false
                 this.alldan = false
@@ -273,8 +285,8 @@
                     if (c < 4) return false
                 }
 
-                if(this.wutiao) {
-                    if(c < 5) return false
+                if (this.wutiao) {
+                    if (c < 5) return false
                 }
 
                 if (this.zasi) {
@@ -282,10 +294,13 @@
                 }
 
                 if (this.xiaoshun) {
-                    if(xiaoshunArr.every(xs => !label.match(new RegExp(xs)))) return false
+                    if (xiaoshunArr.every(xs => !label.match(new RegExp(xs)))) return false
                 }
                 if (this.dashun) {
-							if(dashunArr.every(xs => !label.match(new RegExp(xs)))) return false
+                    if (dashunArr.every(xs => !label.match(new RegExp(xs)))) return false
+                }
+                if (this.wushun) {
+                    if (_5shun.every(xs => !label.match(new RegExp(xs)))) return false
                 }
 
                 if (this.sum.filter(v => v).length > 0) {
@@ -315,8 +330,8 @@
                     if (dans.length !== 3) return false
                 }
 
-                if(this.sidan) {
-                    if(dans.length !== 4) return false
+                if (this.sidan) {
+                    if (dans.length !== 4) return false
                 }
 
                 if (this.alldan) {
