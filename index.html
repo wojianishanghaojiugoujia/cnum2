@@ -92,6 +92,9 @@
                 <input type="checkbox" v-model="zawu"> 杂五
             </label>
             <label class="checkbox-inline">
+                <input type="checkbox" v-model="ershun"> 2顺
+            </label>
+            <label class="checkbox-inline">
                 <input type="checkbox" v-model="xiaoshun"> 3顺
             </label>
             <label class="checkbox-inline">
@@ -173,6 +176,9 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 
 <script>
+    const ershunArr = ['01', '12', '23', '34', '45', '56', '67', '78', '89', '90', '09', '98',
+        '87', '76', '65', '54', '43', '32', '21', '10'
+    ]
     const xiaoshunArr = ['012', '123', '234', '345', '456', '567', '678', '789', '890',
         '210', '321', '432', '543', '654', '765', '876', '987', '098'
     ]
@@ -224,6 +230,7 @@
             twoshuang: false,
             threeshuang: false,
             sum: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            ershun: false,
         },
         computed: {
             all () {
@@ -353,6 +360,14 @@
 
                 if (this.zawu) {
                     if (c > 1) return false
+                }
+
+                if(this.ershun) {
+                    // let del = [];
+                    // [...label].map(Number).reduce((a, b) => {del.push(a-b);return b});
+                    // if(!del.includes(1) && !del.includes(-1) && !del.includes(9) && !del.includes(-9)) return false
+
+                    if (ershunArr.every(xs => !label.match(new RegExp(xs)))) return false
                 }
 
                 if (this.xiaoshun) {
